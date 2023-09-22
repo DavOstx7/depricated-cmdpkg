@@ -1,4 +1,4 @@
-from typing import Union, List, Optional, BinaryIO, Tuple
+from typing import Union, List, Optional, BinaryIO, Tuple, Type
 from cmdpkg._typing import CMDPrimitiveT
 from cmdpkg import utils
 
@@ -13,10 +13,12 @@ def sum_timeouts(*timeouts: Optional[float]) -> Optional[float]:
 
 
 def pipe_cmds(*cmds: CMDPrimitiveT) -> CMDPrimitiveT:
-    _validate_pipe_cmds_args(cmds)
+    _validate_pipe_cmds_args_length(cmds)
     if isinstance(cmds[0], str):
+        _validate_pipe_cmds_args_type(cmds, str)
         return _pipe_str_cmds(cmds)
     else:
+        _validate_pipe_cmds_args_type(cmds, list)
         return _pipe_list_cmds(cmds)
 
 
@@ -57,9 +59,14 @@ class Command:
         return f"{type(self).__name__}({repr(self.cmd)}, timeout={self.timeout}, stdin={self.stdin})"
 
 
-def _validate_pipe_cmds_args(cmds: Tuple[CMDPrimitiveT]):
-    utils.validate_minimum_length(cmds, MIN_CMDS_FOR_PIPE, f"Piping requires at least {MIN_CMDS_FOR_PIPE} cmds")
-    utils.validate_same_type(cmds, "Piping requires the cmds to be of the same type")
+def _validate_pipe_cmds_args_length(cmds: Tuple[CMDPrimitiveT]):
+    if len(cmds) < MIN_CMDS_FOR_PIPE:
+        raise ValueError(f"Piping requires at least {MIN_CMDS_FOR_PIPE} cmds")
+
+
+def _validate_pipe_cmds_args_type(cmds: Tuple[CMDPrimitiveT], _type: Type[CMDPrimitiveT]):
+    if not utils.is_all_items_instance_of(cmds, _type):
+        raise TypeError("Piping requires the cmds to be of the same type/subtype")
 
 
 def _pipe_str_cmds(cmds: Tuple[str]) -> str:

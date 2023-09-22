@@ -40,6 +40,17 @@ files = [
 ]
 
 [[package]]
+name = "dataclasses"
+version = "0.6"
+description = "A backport of the dataclasses module for Python 3.6"
+optional = false
+python-versions = "*"
+files = [
+    {file = "dataclasses-0.6-py3-none-any.whl", hash = "sha256:454a69d788c7fda44efd71e259be79577822f5e3f53f029a22d08004e951dc9f"},
+    {file = "dataclasses-0.6.tar.gz", hash = "sha256:6988bd2b895eef432d562370bb707d540f32f7360ab13da45340101bc2307d84"},
+]
+
+[[package]]
 name = "importlib-metadata"
 version = "4.8.3"
 description = "Read metadata from Python packages"
@@ -192,4 +203,4 @@ testing = ["func-timeout", "jaraco.itertools", "pytest (>=4.6)", "pytest-black (
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.6"
-content-hash = "fc048155cb06c2c0f6eccae1f7c9bc423cb19cad5e49baf7ef0efefe83c1880d"
+content-hash = "e643c224ef02a36e8af5ba423a6301302707e1931f41e73e79fc59c3e68a0a77"

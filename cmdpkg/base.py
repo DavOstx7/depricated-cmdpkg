@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Union, List, BinaryIO, Tuple
 from cmdpkg.command import Command, CMDPrimitiveT
 from cmdpkg import utils
@@ -6,11 +7,11 @@ from cmdpkg import utils
 MIN_RUNNABLES_FOR_PIPE = 2
 
 
+@dataclass
 class RunOutput:
-    def __init__(self, stdout: BinaryIO, stderr: BinaryIO, exit_code: int):
-        self.stdout = stdout
-        self.stderr = stderr
-        self.exit_code = exit_code
+    stdout: BinaryIO
+    stderr: BinaryIO
+    exit_code: int
 
 
 class BaseRunner(ABC):
@@ -35,6 +36,18 @@ class BaseRunner(ABC):
 
 
 def _validate_run_pipe_args(runnable_pipe: Tuple[Command]):
-    utils.validate_minimum_length(runnable_pipe, MIN_RUNNABLES_FOR_PIPE,
-                                  f"Running a pipe requires at least {MIN_RUNNABLES_FOR_PIPE} runnables")
-    utils.validate_same_type(runnable_pipe, "Running a pipe requires the runnables to be of the same type")
+    _validate_run_pipe_args_length(runnable_pipe)
+    _validate_run_pipe_args_type(runnable_pipe)
+    for runnable in runnable_pipe[1:]:
+        if runnable.stdin:
+            raise ValueError("Running a pipe requires all runnable except the first one to not contain stdin")
+
+
+def _validate_run_pipe_args_length(runnable_pipe: Tuple[Command]):
+    if len(runnable_pipe) < MIN_RUNNABLES_FOR_PIPE:
+        raise ValueError(f"Running a pipe requires at least {MIN_RUNNABLES_FOR_PIPE} runnables")
+
+
+def _validate_run_pipe_args_type(runnable_pipe: Tuple[Command]):
+    if not utils.is_all_items_instance_of(runnable_pipe, Command):
+        raise TypeError("Running a pipe requires all the runnables to be an instance of Command")
