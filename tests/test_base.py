@@ -41,17 +41,20 @@ class TestBaseRunner:
         assert fake_command2.stdin == fake_output1.stdout
         assert return_value == fake_output2
 
-    def test_run_pipe_raises(self, cmd_factory, binary_io_factory):
+    def test_run_pipe_raises_type_error(self, cmd_factory, binary_io_factory):
+        cmd, command = cmd_factory(), Command(cmd_factory())
+        runner = BaseRunner()
+
+        with pytest.raises(TypeError):
+            runner.run_pipe(cmd, command)
+
+    def test_run_pipe_raises_value_error(self, cmd_factory, binary_io_factory):
         cmd, command = cmd_factory(), Command(cmd_factory())
         command_with_stdin = Command(cmd_factory(), stdin=binary_io_factory())
         runner = BaseRunner()
 
         with pytest.raises(ValueError):
-            runner.run_pipe()
             runner.run_pipe(cmd)
-
-        with pytest.raises(TypeError):
-            runner.run_pipe(cmd, command)
 
         with pytest.raises(ValueError):
             runner.run_pipe(command, command_with_stdin)

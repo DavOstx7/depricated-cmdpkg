@@ -16,14 +16,19 @@ def test_pipe_cmds():
     assert pipe_cmds(["a", "b"], ["c", "d"]) == ["a", "b", '|', "c", "d"]
 
 
-def test_pipe_cmds_raises():
+def test_pipe_cmds_raises_type_error():
     with pytest.raises(TypeError):
         pipe_cmds("ab", ["c", "d"])
+
+    with pytest.raises(TypeError):
         pipe_cmds(["a", "b"], "cd")
 
+
+def test_pipe_cmds_raises_value_error():
     with pytest.raises(ValueError):
-        pipe_cmds()
         pipe_cmds("ab")
+
+    with pytest.raises(ValueError):
         pipe_cmds(["a", "b"])
 
 
@@ -68,9 +73,8 @@ class TestCommand:
         assert fake_piped_command.timeout == sum_timeouts_mock.return_value
         assert fake_piped_command.stdin == fake_command1.stdin
 
-    def test_pipe_operator_overload_raises(self, binary_io_factory):
+    def test_pipe_operator_overload_raises_value_error(self, binary_io_factory):
         binary_io1, binary_io2 = binary_io_factory(), binary_io_factory()
 
         with pytest.raises(ValueError):
-            Command("ab", stdin=binary_io1) | Command("cd", stdin=binary_io2)
             Command(["a", "b"]) | Command(["c", "d"], stdin=binary_io2)
