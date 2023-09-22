@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from typing import Union, List, BinaryIO, Tuple
 from cmdpkg.command import Command, CMDPrimitiveT
 from cmdpkg import utils
@@ -6,11 +7,11 @@ from cmdpkg import utils
 MIN_RUNNABLES_FOR_PIPE = 2
 
 
+@dataclass
 class RunOutput:
-    def __init__(self, stdout: BinaryIO, stderr: BinaryIO, exit_code: int):
-        self.stdout = stdout
-        self.stderr = stderr
-        self.exit_code = exit_code
+    stdout: BinaryIO
+    stderr: BinaryIO
+    exit_code: int
 
 
 class BaseRunner(ABC):
