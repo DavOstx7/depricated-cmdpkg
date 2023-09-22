@@ -1,21 +1,18 @@
 import subprocess
+from dataclasses import dataclass
 from typing import Union, Optional
 from cmdpkg._typing import EnvironmentT, ProcessInputOutputT, KwargsT
 from cmdpkg.base import BaseRunner, RunOutput, Command, CMDPrimitiveT
 from cmdpkg.models import DataStreamer
 
 
+@dataclass
 class ProcessRunnerSettings:
-    def __init__(self, env: Optional[EnvironmentT] = None,
-                 cwd: Optional[str] = None,
-                 stdin: Optional[ProcessInputOutputT] = None,
-                 stdout: Optional[ProcessInputOutputT] = None,
-                 stderr: Optional[ProcessInputOutputT] = None):
-        self.env = env
-        self.cwd = cwd
-        self.stdin = stdin if stdin else subprocess.PIPE
-        self.stdout = stdout if stdin else subprocess.PIPE
-        self.stderr = stderr if stdin else subprocess.PIPE
+    env: Optional[EnvironmentT] = None
+    cwd: Optional[str] = None
+    stdin: Optional[ProcessInputOutputT] = subprocess.PIPE
+    stdout: Optional[ProcessInputOutputT] = subprocess.PIPE
+    stderr: Optional[ProcessInputOutputT] = subprocess.PIPE
 
     @property
     def start_process_kwargs(self) -> KwargsT:

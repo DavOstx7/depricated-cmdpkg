@@ -1,13 +1,15 @@
 [tool.poetry]
 name = "cmdpkg"
-version = "0.1.0"
+version = "0.2.0"
 description = "Run Commands In Different Ways"
 authors = ["dav ost <davidost2003@gmail.com>"]
-license = "LICENSE"
+license = "MIT"
 readme = "README.md"
+repository = "https://github.com/DavOstx7/cmdpkg"
 
 [tool.poetry.dependencies]
 python = "^3.6"
+dataclasses = "^0.6"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^6.0.0"
