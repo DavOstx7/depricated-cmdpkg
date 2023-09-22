@@ -38,6 +38,9 @@ class BaseRunner(ABC):
 def _validate_run_pipe_args(runnable_pipe: Tuple[Command]):
     _validate_run_pipe_args_length(runnable_pipe)
     _validate_run_pipe_args_type(runnable_pipe)
+    for runnable in runnable_pipe[1:]:
+        if runnable.stdin:
+            raise ValueError("Running a pipe requires all runnable except the first one to not contain stdin")
 
 
 def _validate_run_pipe_args_length(runnable_pipe: Tuple[Command]):
