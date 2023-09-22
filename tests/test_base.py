@@ -42,8 +42,7 @@ def test_run_pipe(run_mock: Mock, cmd_factory, output_factory):
     assert return_value == fake_output2
 
 
-@patch.object(BaseRunner, 'run')
-def test_run_pipe_raises(run_mock: Mock, cmd_factory):
+def test_run_pipe_raises(cmd_factory):
     cmd, command = cmd_factory(), Command(cmd_factory())
     runner = BaseRunner()
 

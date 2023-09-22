@@ -36,6 +36,15 @@ class BaseRunner(ABC):
 
 
 def _validate_run_pipe_args(runnable_pipe: Tuple[Command]):
-    utils.validate_minimum_length(runnable_pipe, MIN_RUNNABLES_FOR_PIPE,
-                                  f"Running a pipe requires at least {MIN_RUNNABLES_FOR_PIPE} runnables")
-    utils.validate_same_type(runnable_pipe, "Running a pipe requires the runnables to be of the same type")
+    _validate_run_pipe_args_length(runnable_pipe)
+    _validate_run_pipe_args_type(runnable_pipe)
+
+
+def _validate_run_pipe_args_length(runnable_pipe: Tuple[Command]):
+    if len(runnable_pipe) < MIN_RUNNABLES_FOR_PIPE:
+        raise ValueError(f"Running a pipe requires at least {MIN_RUNNABLES_FOR_PIPE} runnables")
+
+
+def _validate_run_pipe_args_type(runnable_pipe: Tuple[Command]):
+    if not utils.is_all_items_instance_of(runnable_pipe, Command):
+        raise TypeError("Running a pipe requires all the runnables to be an instance of Command")
