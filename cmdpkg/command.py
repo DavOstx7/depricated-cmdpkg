@@ -36,13 +36,13 @@ class Command:
     def _from_piping_command(self, other: 'Command') -> 'Command':
         if other.stdin:
             raise ValueError(f"Cannot pipe other command since it contains stdin")
-        new_timeout = sum_timeouts(self.timeout, other.timeout)
         new_cmd = pipe_cmds(self.cmd, other.cmd)
-        return Command(new_cmd, new_timeout, self.stdin)
+        new_timeout = sum_timeouts(self.timeout, other.timeout)
+        return Command(new_cmd, timeout=new_timeout, stdin=self.stdin)
 
     def _from_piping_cmd(self, other: CMDPrimitiveT) -> 'Command':
         new_cmd = pipe_cmds(self.cmd, other)
-        return Command(new_cmd, self.timeout, self.stdin)
+        return Command(new_cmd)
 
     def __eq__(self, other: Union['Command', CMDPrimitiveT]) -> bool:
         if isinstance(other, Command):
@@ -65,7 +65,7 @@ def _validate_pipe_cmds_args_length(cmds: Tuple[CMDPrimitiveT]):
 
 
 def _validate_pipe_cmds_args_type(cmds: Tuple[CMDPrimitiveT], _type: Type[CMDPrimitiveT]):
-    if not utils.is_all_items_instance_of(cmds, _type):
+    if not utils.is_items_instance_of(cmds, _type):
         raise TypeError("Piping requires the cmds to be of the same type/subtype")
 
 

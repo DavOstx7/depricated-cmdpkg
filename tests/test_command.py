@@ -48,30 +48,30 @@ class TestCommand:
     @patch('cmdpkg.command.pipe_cmds')
     def test_pipe_operator_overload_on_cmd(self, pipe_cmds_mock: Mock, cmd_factory):
         cmd1, cmd2 = cmd_factory(), cmd_factory()
-        fake_command = Command(cmd1)
+        command1 = Command(cmd1)
 
-        fake_piped_command = fake_command | cmd2
+        return_value = command1 | cmd2
 
         pipe_cmds_mock.assert_called_once_with(cmd1, cmd2)
-        assert fake_piped_command.cmd == pipe_cmds_mock.return_value
-        assert fake_piped_command.timeout == fake_command.timeout
-        assert fake_piped_command.stdin == fake_command.stdin
+        assert return_value.cmd == pipe_cmds_mock.return_value
+        assert return_value.timeout == command1.timeout
+        assert return_value.stdin == command1.stdin
 
     @patch('cmdpkg.command.sum_timeouts')
     @patch('cmdpkg.command.pipe_cmds')
     def test_pipe_operator_overload_on_command(self, pipe_cmds_mock: Mock, sum_timeouts_mock: Mock, cmd_factory,
                                                timeout_factory):
         cmd1, cmd2 = cmd_factory(), cmd_factory()
-        t1, t2 = timeout_factory(), timeout_factory()
-        fake_command1, fake_command2 = Command(cmd1, t1), Command(cmd2, t2)
+        timeout1, timeout2 = timeout_factory(), timeout_factory()
+        command1, command2 = Command(cmd1, timeout1), Command(cmd2, timeout2)
 
-        fake_piped_command = fake_command1 | fake_command2
+        return_value = command1 | command2
 
         pipe_cmds_mock.assert_called_once_with(cmd1, cmd2)
-        sum_timeouts_mock.assert_called_once_with(t1, t2)
-        assert fake_piped_command.cmd == pipe_cmds_mock.return_value
-        assert fake_piped_command.timeout == sum_timeouts_mock.return_value
-        assert fake_piped_command.stdin == fake_command1.stdin
+        sum_timeouts_mock.assert_called_once_with(timeout1, timeout2)
+        assert return_value.cmd == pipe_cmds_mock.return_value
+        assert return_value.timeout == sum_timeouts_mock.return_value
+        assert return_value.stdin == command1.stdin
 
     def test_pipe_operator_overload_raises_value_error(self, binary_io_factory):
         binary_io1, binary_io2 = binary_io_factory(), binary_io_factory()

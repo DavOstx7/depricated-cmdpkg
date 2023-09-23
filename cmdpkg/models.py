@@ -1,8 +1,8 @@
 import time
 from typing import BinaryIO
 
-NO_BUFFER = -1
-LINE_BUFFER = -2
+NO_BUFFERING = -1
+LINE_BUFFERING = -2
 
 NO_INTERVAL = -1
 
@@ -28,8 +28,8 @@ class DataStreamer:
             time.sleep(self.interval)
 
     def _read_data(self, source: BinaryIO):
-        if self.reading_buffer == NO_BUFFER:
+        if self.reading_buffer == NO_BUFFERING:
             return source.read()
-        elif self.reading_buffer == LINE_BUFFER:
+        elif self.reading_buffer == LINE_BUFFERING:
             return source.readline()
         return source.read(self.reading_buffer)
