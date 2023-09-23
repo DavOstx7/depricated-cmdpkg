@@ -2,12 +2,12 @@ import pytest
 from unittest.mock import patch, Mock, call
 
 import random
-from cmdpkg.models import DataStreamer, LINE_BUFFER, NO_BUFFER, NO_INTERVAL
+from cmdpkg.models import DataStreamer, LINE_BUFFERING, NO_BUFFERING, NO_INTERVAL
 
 
 @pytest.fixture(scope="module")
 def buffer() -> int:
-    return random.choice([random.randint(1, 1024), LINE_BUFFER, NO_BUFFER])
+    return random.choice([random.randint(1, 1024), LINE_BUFFERING, NO_BUFFERING])
 
 
 @pytest.fixture(scope="module")
@@ -25,7 +25,7 @@ class TestDataStreamer:
         assert return_value == source.read.return_value
 
     def test_read_data_with_line_buffer(self, binary_io_factory):
-        data_streamer = DataStreamer(reading_buffer=LINE_BUFFER)
+        data_streamer = DataStreamer(reading_buffer=LINE_BUFFERING)
         source = binary_io_factory()
         return_value = data_streamer._read_data(source)
 
@@ -33,7 +33,7 @@ class TestDataStreamer:
         assert return_value == source.readline.return_value
 
     def test_read_data_without_buffer(self, binary_io_factory):
-        data_streamer = DataStreamer(reading_buffer=NO_BUFFER)
+        data_streamer = DataStreamer(reading_buffer=NO_BUFFERING)
         source = binary_io_factory()
         return_value = data_streamer._read_data(source)
 

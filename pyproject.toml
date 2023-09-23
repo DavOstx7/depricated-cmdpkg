@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "cmdpkg"
-version = "0.2.0"
+version = "0.2.1"
 description = "Run Commands In Different Ways"
 authors = ["dav ost <davidost2003@gmail.com>"]
 license = "MIT"

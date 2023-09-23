@@ -8,10 +8,10 @@ def test_filter_none_values():
 
 
 def test_is_items_instance_of():
-    assert utils.is_all_items_instance_of((), int)
+    assert utils.is_items_instance_of((), int)
 
-    assert utils.is_all_items_instance_of((1, 2, 3), int)
-    assert utils.is_all_items_instance_of((True, False), bool)
+    assert utils.is_items_instance_of((1, 2, 3), int)
+    assert utils.is_items_instance_of((True, False), bool)
 
-    assert not utils.is_all_items_instance_of((1, 2, 3), str)
-    assert not utils.is_all_items_instance_of((1, False), str)
+    assert not utils.is_items_instance_of((1, 2, 3), str)
+    assert not utils.is_items_instance_of((1, False), str)
