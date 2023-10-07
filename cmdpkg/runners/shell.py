@@ -1,12 +1,7 @@
 from typing import Optional
-from cmdpkg.process import ProcessRunner, ProcessRunnerSettings, KwargsT
+from cmdpkg.runners.process import ProcessRunner
+from cmdpkg.runners.models import ShellRunnerSettings
 from cmdpkg.models import DataStreamer
-
-
-class ShellRunnerSettings(ProcessRunnerSettings):
-    @property
-    def start_process_kwargs(self) -> KwargsT:
-        return {'shell': True, **super().start_process_kwargs}
 
 
 class ShellRunner(ProcessRunner):
