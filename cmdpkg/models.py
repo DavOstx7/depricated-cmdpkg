@@ -1,14 +1,15 @@
 import time
 from typing import BinaryIO
+import io
 
-NO_BUFFERING = -1
-LINE_BUFFERING = -2
+NO_BUFFERING = 0
+LINE_BUFFERING = 1
 
-NO_INTERVAL = -1
+NO_INTERVAL = 0
 
 
 class DataStreamer:
-    def __init__(self, reading_buffer: int = 1024, interval: float = 0.2):
+    def __init__(self, reading_buffer: int = io.DEFAULT_BUFFER_SIZE, interval: float = 0.2):
         self.reading_buffer = reading_buffer
         self.interval = interval
 
