@@ -1,25 +1,8 @@
 import subprocess
-from dataclasses import dataclass
 from typing import Union, Optional
-from cmdpkg._typing import EnvironmentT, ProcessInputOutputT, KwargsT
-from cmdpkg.base import BaseRunner, RunOutput, Command, CMDPrimitiveT
+from cmdpkg.runners.base import BaseRunner, RunOutput, BaseCommand, CMDPrimitiveT
+from cmdpkg.runners.models import ProcessRunnerSettings
 from cmdpkg.models import DataStreamer
-
-
-@dataclass
-class ProcessRunnerSettings:
-    env: Optional[EnvironmentT] = None
-    cwd: Optional[str] = None
-    stdin: Optional[ProcessInputOutputT] = subprocess.PIPE
-    stdout: Optional[ProcessInputOutputT] = subprocess.PIPE
-    stderr: Optional[ProcessInputOutputT] = subprocess.PIPE
-
-    @property
-    def start_process_kwargs(self) -> KwargsT:
-        return {
-            'env': self.env, 'cwd': self.cwd,
-            'stdin': self.stdin, 'stdout': self.stdout, 'stderr': self.stderr
-        }
 
 
 class ProcessRunner(BaseRunner):
@@ -27,12 +10,12 @@ class ProcessRunner(BaseRunner):
         self.settings = settings if settings else ProcessRunnerSettings()
         self.streamer = streamer if streamer else DataStreamer()
 
-    def run(self, runnable: Union[Command, CMDPrimitiveT]) -> RunOutput:
-        if isinstance(runnable, Command):
+    def run(self, runnable: Union[BaseCommand, CMDPrimitiveT]) -> RunOutput:
+        if isinstance(runnable, BaseCommand):
             return self._run_command(runnable)
         return self._run_cmd(runnable)
 
-    def _run_command(self, command: Command) -> RunOutput:
+    def _run_command(self, command: BaseCommand) -> RunOutput:
         process = subprocess.Popen(command.cmd, **self.settings.start_process_kwargs)
         if command.stdin:
             self.streamer.stream(source=command.stdin, destination=process.stdin)

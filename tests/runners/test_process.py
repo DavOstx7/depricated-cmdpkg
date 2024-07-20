@@ -1,19 +1,6 @@
 from unittest.mock import patch, Mock
 
-from cmdpkg.process import ProcessRunner, ProcessRunnerSettings, DataStreamer, Command
-
-
-class TestProcessRunnerSettings:
-    def test_start_process_kwargs(self):
-        settings = ProcessRunnerSettings()
-
-        assert settings.start_process_kwargs == {
-            'env': settings.env,
-            'cwd': settings.cwd,
-            'stdin': settings.stdin,
-            'stdout': settings.stdout,
-            'stderr': settings.stderr
-        }
+from cmdpkg.runners.process import ProcessRunner, BaseCommand, ProcessRunnerSettings, DataStreamer
 
 
 class TestProcessRunner:
@@ -36,7 +23,7 @@ class TestProcessRunner:
     @patch.object(DataStreamer, 'stream')
     def test_run_command_with_stdin(self, stream_mock: Mock, popen_class_mock: Mock, cmd_factory, timeout_factory,
                                     binary_io_factory):
-        command = Command(cmd_factory(), timeout=timeout_factory(), stdin=binary_io_factory())
+        command = BaseCommand(cmd_factory(), timeout=timeout_factory(), stdin=binary_io_factory())
         settings = ProcessRunnerSettings()
         streamer = DataStreamer()
         runner = ProcessRunner(settings=settings, streamer=streamer)
@@ -55,7 +42,7 @@ class TestProcessRunner:
     @patch.object(DataStreamer, 'stream')
     def test_run_command_without_stdin(self, stream_mock: Mock, popen_class_mock: Mock, cmd_factory, timeout_factory,
                                        binary_io_factory):
-        command = Command(cmd_factory(), timeout=timeout_factory())
+        command = BaseCommand(cmd_factory(), timeout=timeout_factory())
         settings = ProcessRunnerSettings()
         streamer = DataStreamer()
         runner = ProcessRunner(settings=settings, streamer=streamer)

@@ -1,35 +1,12 @@
 import pytest
 from unittest.mock import patch, Mock
 
-from cmdpkg.command import pipe_cmds, sum_timeouts
-from cmdpkg.command import Command
+from cmdpkg.commands.base import BaseCommand, Command
 
 
-def test_sum_timeouts():
-    assert sum_timeouts(1, 2, 3) == 6
-    assert sum_timeouts(1, None, 3) == 4
-    assert sum_timeouts(None, None, None) is None
-
-
-def test_pipe_cmds():
-    assert pipe_cmds("ab", "cd") == "ab | cd"
-    assert pipe_cmds(["a", "b"], ["c", "d"]) == ["a", "b", '|', "c", "d"]
-
-
-def test_pipe_cmds_raises_type_error():
-    with pytest.raises(TypeError):
-        pipe_cmds("ab", ["c", "d"])
-
-    with pytest.raises(TypeError):
-        pipe_cmds(["a", "b"], "cd")
-
-
-def test_pipe_cmds_raises_value_error():
-    with pytest.raises(ValueError):
-        pipe_cmds("ab")
-
-    with pytest.raises(ValueError):
-        pipe_cmds(["a", "b"])
+class TestBaseCommand:
+    # No tests currently
+    pass
 
 
 class TestCommand:
@@ -45,7 +22,7 @@ class TestCommand:
         assert Command("ab", timeout=1) == Command("ab", timeout=1)
         assert Command(["a", "b"], stdin=binary_io) == Command(["a", "b"], stdin=binary_io)
 
-    @patch('cmdpkg.command.pipe_cmds')
+    @patch('cmdpkg.commands.utils.pipe_cmds')
     def test_pipe_operator_overload_on_cmd(self, pipe_cmds_mock: Mock, cmd_factory):
         cmd1, cmd2 = cmd_factory(), cmd_factory()
         command1 = Command(cmd1)
@@ -57,8 +34,8 @@ class TestCommand:
         assert return_value.timeout == command1.timeout
         assert return_value.stdin == command1.stdin
 
-    @patch('cmdpkg.command.sum_timeouts')
-    @patch('cmdpkg.command.pipe_cmds')
+    @patch('cmdpkg.commands.utils.sum_timeouts')
+    @patch('cmdpkg.commands.utils.pipe_cmds')
     def test_pipe_operator_overload_on_command(self, pipe_cmds_mock: Mock, sum_timeouts_mock: Mock, cmd_factory,
                                                timeout_factory):
         cmd1, cmd2 = cmd_factory(), cmd_factory()
