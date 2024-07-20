@@ -10,6 +10,5 @@ class ShellRunnerSettings(ProcessRunnerSettings):
 
 
 class ShellRunner(ProcessRunner):
-    def __init__(self, settings: Optional[ShellRunnerSettings] = None, streamer: Optional[DataStreamer] = None):
-        settings = settings if settings else ShellRunnerSettings()
-        super().__init__(settings, streamer)
+    def __init__(self, settings: Optional[ShellRunnerSettings] = None, data_streamer: Optional[DataStreamer] = None):
+        super().__init__(settings if settings else ShellRunnerSettings(), data_streamer)

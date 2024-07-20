@@ -1,8 +1,44 @@
 from typing import Union, List, Optional, BinaryIO, Tuple
-from cmdpkg._typing import CMDPrimitiveT
+from cmdpkg._typing import PrimitiveCommandT
 from cmdpkg import utils
 
-MIN_CMDS_FOR_PIPE = 2
+
+class Command:
+    def __init__(self, command: PrimitiveCommandT, timeout: Optional[float] = None, stdin: Optional[BinaryIO] = None):
+        self.command = command
+        self.timeout = timeout
+        self.stdin = stdin
+
+    def __or__(self, other: Union['Command', PrimitiveCommandT]) -> 'Command':
+        if isinstance(other, Command):
+            return self._pipe_command(other)
+        return self._pipe_primitive_command(other)
+
+    def _pipe_command(self, other: 'Command') -> 'Command':
+        if other.stdin:
+            raise ValueError(f"Cannot pipe other runnable since it contains stdin")
+        new_timeout = sum_timeouts(self.timeout, other.timeout)
+        new_command = pipe_commands(self.command, other.command)
+        return self._from_params(command=new_command, timeout=new_timeout, stdin=self.stdin)
+
+    def _pipe_primitive_command(self, other: PrimitiveCommandT) -> 'Command':
+        new_command = pipe_commands(self.command, other)
+        return self._from_params(command=new_command, timeout=self.timeout, stdin=self.stdin)
+
+    @classmethod
+    def _from_params(cls, *args, **kwargs):
+        return cls(*args, **kwargs)
+
+    def __eq__(self, other: Union['Command', PrimitiveCommandT]) -> bool:
+        if isinstance(other, Command):
+            return self.command == other.command and self.timeout == other.timeout and self.stdin == other.stdin
+        return self.command == other
+
+    def __str__(self) -> str:
+        return f"{type(self).__name__}({repr(self.command)})"
+
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({repr(self.command)}, timeout={self.timeout}, stdin={self.stdin})"
 
 
 def sum_timeouts(*timeouts: Optional[float]) -> Optional[float]:
@@ -12,65 +48,35 @@ def sum_timeouts(*timeouts: Optional[float]) -> Optional[float]:
     return sum(timeouts)
 
 
-def pipe_cmds(*cmds: CMDPrimitiveT) -> CMDPrimitiveT:
-    _validate_pipe_cmds_args(cmds)
-    if isinstance(cmds[0], str):
-        return _pipe_str_cmds(cmds)
+def pipe_commands(*commands: PrimitiveCommandT) -> PrimitiveCommandT:
+    _validate_pipe_commands_args(commands)
+    if isinstance(commands[0], str):
+        return _pipe_str_commands(commands)
     else:
-        return _pipe_list_cmds(cmds)
+        return _pipe_list_commands(commands)
 
 
-class Command:
-    def __init__(self, cmd: CMDPrimitiveT, timeout: Optional[float] = None, stdin: Optional[BinaryIO] = None):
-        self.cmd = cmd
-        self.timeout = timeout
-        self.stdin = stdin
-
-    def __or__(self, other: Union['Command', CMDPrimitiveT]) -> 'Command':
-        if isinstance(other, Command):
-            return self._from_piping_command(other)
-        return self._from_piping_cmd(other)
-
-    def _from_piping_command(self, other: 'Command') -> 'Command':
-        if other.stdin:
-            raise ValueError(f"Cannot pipe other command since it contains stdin")
-        new_timeout = sum_timeouts(self.timeout, other.timeout)
-        new_cmd = pipe_cmds(self.cmd, other.cmd)
-        return Command(new_cmd, new_timeout, self.stdin)
-
-    def _from_piping_cmd(self, other: CMDPrimitiveT) -> 'Command':
-        new_cmd = pipe_cmds(self.cmd, other)
-        return Command(new_cmd, self.timeout, self.stdin)
-
-    def __eq__(self, other: Union['Command', CMDPrimitiveT]) -> bool:
-        if isinstance(other, Command):
-            return self.cmd == other.cmd and self.timeout == other.timeout and self.stdin == other.stdin
-        return self.cmd == other
-
-    def __ne__(self, other: Union['Command', CMDPrimitiveT]):
-        return not self == other
-
-    def __str__(self) -> str:
-        return self.cmd
-
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({repr(self.cmd)}, timeout={self.timeout}, stdin={self.stdin})"
+def _validate_pipe_commands_args(commands: Tuple[PrimitiveCommandT]):
+    utils.validate_minimum_length(commands, 2, "Piping requires to provide at least 2 arguments")
+    utils.validate_same_type(commands, "Piping requires the provided arguments to be of the same type")
 
 
-def _validate_pipe_cmds_args(cmds: Tuple[CMDPrimitiveT]):
-    utils.validate_minimum_length(cmds, MIN_CMDS_FOR_PIPE, f"Piping requires at least {MIN_CMDS_FOR_PIPE} cmds")
-    utils.validate_same_type(cmds, "Piping requires the cmds to be of the same type")
+def _pipe_str_commands(commands: Tuple[str]) -> str:
+    piped_command = ""
+    for current_command in commands:
+        piped_command += current_command + ' | '
+    return piped_command[:-3]
 
 
-def _pipe_str_cmds(cmds: Tuple[str]) -> str:
-    piped_cmd = ""
-    for cmd in cmds:
-        piped_cmd += cmd + ' | '
-    return piped_cmd[:-3]
+def _pipe_list_commands(commands: Tuple[List[str]]) -> List[str]:
+    piped_command = []
+    for current_command in commands:
+        piped_command += current_command + ['|']
+    return piped_command[:-1]
 
 
-def _pipe_list_cmds(cmds: Tuple[List[str]]) -> List[str]:
-    piped_cmd = []
-    for cmd in cmds:
-        piped_cmd += cmd + ['|']
-    return piped_cmd[:-1]
+class CommandA(Command):
+    pass
+
+
+print(repr(CommandA("a", timeout=2) | Command("c")))

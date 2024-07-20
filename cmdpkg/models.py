@@ -1,7 +1,7 @@
 import time
 from typing import BinaryIO
 
-LINE_BUFFER = -1
+ONE_LINE_BUFFER = -1
 
 
 class DataStreamer:
@@ -11,7 +11,6 @@ class DataStreamer:
 
     def stream(self, source: BinaryIO, destination: BinaryIO):
         data = self._read_data(source)
-
         while data:
             destination.write(data)
             destination.flush()
@@ -21,6 +20,6 @@ class DataStreamer:
         destination.close()
 
     def _read_data(self, source: BinaryIO):
-        if self.reading_buffer == LINE_BUFFER:
+        if self.reading_buffer == ONE_LINE_BUFFER:
             return source.readline()
         return source.read(self.reading_buffer)
